@@ -101,7 +101,7 @@ def generate_dropdown_options(matchs_stats):
     ]
 
 
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = dash.Dash(__name__, meta_tags=[{"name": "viewport", "content": "width=device-width"}])
 server = app.server
 
 # Load argument
@@ -133,11 +133,42 @@ app.layout = html.Div(children=[
             )
         ),
         html.Div(
-            [dcc.Graph(id="main_graph")],
-            className="pretty_container seven columns",
+            [
+                html.Div(
+                    [dcc.Graph(id="main_graph")],
+                    className="pretty_container seven columns",
+                ),
+                html.Div(
+                    [dcc.Graph(id="goal_graph")],
+                    className="pretty_container five columns",
+                ),
+            ],
+            className="row flex-display",
         ),
-    ])
+    ],
+    id="mainContainer",
+    style={"display": "flex", "flex-direction": "column"}
+    )
 ])
+
+@app.callback(
+    Output('goal_graph', 'figure'),
+    [Input('players_options', 'value')]
+)
+def update_figure(selected_players):
+    return {
+        'data': [
+            go.Bar(
+                x=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['DAY'],
+                y=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['GOAL'],
+                name='GOAL',
+            )
+        ],
+        'layout': go.Layout(
+            xaxis={'title': 'Day', 'range': [0, 38], 'dtick': 5},
+            yaxis={'title': 'Goal', 'range': [0, 5], 'dtick': 1}
+        )
+}
 
 @app.callback(
     Output('main_graph', 'figure'),
@@ -154,18 +185,11 @@ def update_figure(selected_players):
                     'line': {'width': 0.5, 'color': 'white'}
                 },
                     name='SCORE',
-                ),
-            go.Scatter(
-                x=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['DAY'],
-                y=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['GOAL'],
-                mode='markers',
-                name='GOAL',
-            )
+                )
         ],
         'layout': go.Layout(
-            title={'text': str(matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['LASTNAME'].unique()), 'xref': 'paper', 'x': 0},
-            xaxis={'title': 'Journée', 'range': [0, 38], 'dtick': 5},
-            yaxis={'range': [0, 10], 'dtick': 1}
+            xaxis={'title': 'Day', 'range': [0, 38], 'dtick': 5},
+            yaxis={'title': 'Score', 'range': [0, 10], 'dtick': 1}
         )
 }
 

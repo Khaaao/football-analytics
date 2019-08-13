@@ -2,10 +2,13 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objects as go
+from dash.dependencies import Input, Output
 from pandas.io.json import json_normalize
 import pandas as pd
 import argparse
 import json
+
+external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 def was_on_field(player_data):
     ''' Basic function, return if player played '''
@@ -37,7 +40,7 @@ def normalize_raw_data(raw_data):
 
 def generate_line_graph_by_player_id(matchs_stats, player_id):
     return dcc.Graph(
-        id=player_id,
+        id=f'{player_id}_first_chart',
         figure={
             'data': [
                 go.Scatter(
@@ -52,17 +55,33 @@ def generate_line_graph_by_player_id(matchs_stats, player_id):
                 go.Scatter(
                     x=matchs_stats[matchs_stats['PLAYER_ID']==player_id]['DAY'],
                     y=matchs_stats[matchs_stats['PLAYER_ID']==player_id]['GOAL'],
-                    marker={
-                        'size': 15,
-                        'line': {'width': 0.5, 'color': 'white'}
-                    },
+                    mode='markers',
                     name='GOAL',
                 )
             ],
             'layout': go.Layout(
                 title={'text': str(matchs_stats[matchs_stats['PLAYER_ID']==player_id]['LASTNAME'].unique()), 'xref': 'paper', 'x': 0},
-                xaxis={'title': 'Journée', 'range': [1, 37], 'dtick': 5},
+                xaxis={'title': 'Journée', 'range': [0, 38], 'dtick': 5},
                 yaxis={'range': [0, 10], 'dtick': 1}
+            )
+        }
+    )
+
+def generate_bar_graph_by_player_id(matchs_stats, player_id):
+    return dcc.Graph(
+        id=f'{player_id}_second_chart',
+        figure={
+            'data': [
+                go.Bar(
+                    x=matchs_stats[matchs_stats['PLAYER_ID']==player_id]['DAY'],
+                    y=matchs_stats[matchs_stats['PLAYER_ID']==player_id]['MIN_PLAYED'],
+                    name='MIN_PLAYED',
+                )
+            ],
+            'layout': go.Layout(
+                title={'text': str(matchs_stats[matchs_stats['PLAYER_ID']==player_id]['LASTNAME'].unique()), 'xref': 'paper', 'x': 0},
+                xaxis={'title': 'Journée', 'range': [0, 38], 'dtick': 5},
+                yaxis={'title': 'Minutes played', 'dtick': 20}
             )
         }
     )
@@ -72,50 +91,83 @@ def generate_for_squad(matchs_stats):
     graph = []
     for player in my_squad:
         graph.append(generate_line_graph_by_player_id(matchs_stats, player))
-
+        graph.append(generate_bar_graph_by_player_id(matchs_stats, player))
     return graph
 
+def generate_dropdown_options(matchs_stats):
+    return [
+        {"label": str(matchs_stats[matchs_stats['PLAYER_ID']==player_id]['LASTNAME'].unique()), "value": str(player_id)}
+        for player_id in matchs_stats["PLAYER_ID"]
+    ]
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("player", help="MPG NAME to load config_file")
-    parser.add_argument("championchip", help="Specify championchip (FL1 = Ligue 1, PL = PREMIER LEAGUE, PD = Primera Division , FL2 = Ligue 2, SA = Serie A)")
-    args = parser.parse_args()
 
-    matchs_stats = normalize_raw_data(pd.read_json(f'data/{args.championchip}_DATA.json'))
+app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+server = app.server
 
-    external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
+# Load argument
+parser = argparse.ArgumentParser()
+parser.add_argument("player", help="MPG NAME to load config_file")
+parser.add_argument("championchip", help="Specify championchip (FL1 = Ligue 1, PL = PREMIER LEAGUE, PD = Primera Division , FL2 = Ligue 2, SA = Serie A)")
+args = parser.parse_args()
 
-    app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+# Load data
+matchs_stats = normalize_raw_data(pd.read_json(f'data/{args.championchip}_DATA.json'))
 
-    app.layout = html.Div(children=[
-        html.Div([
-            html.Div(
-                [
-                    html.H3(
-                        "In-Depth Player Analysis",
-                        style={"margin-bottom": "0px"},
-                    ),
-                ],
-                className="one-half column",
-                id="title",
-            ),
-            html.Div(generate_for_squad(matchs_stats))
-        ])
+# Create app layout
+app.layout = html.Div(children=[
+    html.Div([
+        html.Div(
+            [
+                html.H3(
+                    "In-Depth Player Analysis",
+                    style={"margin-bottom": "0px"},
+                ),
+            ],
+            className="one-half column",
+            id="title",
+        ),
+        html.Div(
+            dcc.Dropdown(
+                id="players_options",
+                options=generate_dropdown_options(matchs_stats),
+            )
+        ),
+        html.Div(
+            [dcc.Graph(id="main_graph")],
+            className="pretty_container seven columns",
+        ),
     ])
-    app.run_server(debug=True)
+])
 
-    # fig = go.Figure()
-    # fig.add_trace(go.Scatter(x=matchs_stats[matchs_stats['PLAYER_ID']=='37743']['DAY'], y=matchs_stats[matchs_stats['PLAYER_ID']=='37743']['SCORE'],
-    #                 mode='lines',
-    #                 name=str(matchs_stats[matchs_stats['PLAYER_ID']=='37743']['LASTNAME'])),
-    #                 ,
-    #             go.Scatter(x=matchs_stats[matchs_stats['PLAYER_ID']=='37743']['DAY'], y=matchs_stats[matchs_stats['PLAYER_ID']=='37743']['GOAL'],
-    #                 mode='lines',
-    #                 name=str(matchs_stats[matchs_stats['PLAYER_ID']=='37743']['LASTNAME'])))
-    # fig.update_xaxes(range=[0, 37])
-    # fig.update_yaxes(range=[0, 10])
-    # fig.show()
+@app.callback(
+    Output('main_graph', 'figure'),
+    [Input('players_options', 'value')]
+)
+def update_figure(selected_players):
+    return {
+        'data': [
+            go.Scatter(
+                x=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['DAY'],
+                y=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['SCORE'],
+                marker={
+                    'size': 15,
+                    'line': {'width': 0.5, 'color': 'white'}
+                },
+                    name='SCORE',
+                ),
+            go.Scatter(
+                x=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['DAY'],
+                y=matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['GOAL'],
+                mode='markers',
+                name='GOAL',
+            )
+        ],
+        'layout': go.Layout(
+            title={'text': str(matchs_stats[matchs_stats['PLAYER_ID']==selected_players]['LASTNAME'].unique()), 'xref': 'paper', 'x': 0},
+            xaxis={'title': 'Journée', 'range': [0, 38], 'dtick': 5},
+            yaxis={'range': [0, 10], 'dtick': 1}
+        )
+}
 
 if __name__ == '__main__':
-    main()
+    app.run_server(debug=True)

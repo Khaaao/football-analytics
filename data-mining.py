@@ -10,9 +10,10 @@ load_dotenv()
 # print(os.getenv("X-RAPIDAPI-KEY"))
 # print(os.getenv("THROTTLING"))
 
-THROTTLING = 2
+THROTTLING = 1
 curr_throttling = 0
 headers = {'Content-Type': 'application/json', 'x-rapidapi-key': os.getenv("X-RAPIDAPI-KEY")}
+day=[]
 
 ########
 # TODO DYNAMAC FIXTURE UPLOAD
@@ -25,7 +26,7 @@ if not (os.path.isfile('data/football_data.csv')):
     with open('data/football_data.csv', 'w', encoding='utf-8') as csvfile:
         spamwriter = csv.writer(csvfile, delimiter=';', quotechar='|', quoting=csv.QUOTE_MINIMAL)
         # TODO add league info
-        spamwriter.writerow(["league_id", "fixture_id", "round","team_id", "team_name", "player_id", "player_name", "player_position", "player_rating", "player_minutes_played", "player_is_substitute", "shots_total", "shots_on", "goals_total", "goals_conceded", "goal_assists", "passes_total", "passes_key", "passes_accuracy", "tackles_total", "tackles_blocks", "tackles_interceptions", "duels_total", "duels_won", "dribbles_total", "dribbles_attempts", "dribbles_success", "dribbles_past", "fouls_drawn", "fouls_committed", "cards_yellow", "cards_red", "penalty_won", "penalty_commited", "penalty_missed", "penalty_saved", "penalty_success"])
+        spamwriter.writerow(["league_id", "fixture_id", "round","team_id", "team_name", "player_id", "player_name", "player_position", "player_rating", "player_minutes_played", "player_is_substitute", "shots_total", "shots_on", "goals_total", "goals_conceded", "goal_assists", "passes_total", "passes_key", "passes_accuracy", "tackles_total", "tackles_blocks", "tackles_interceptions", "duels_total", "duels_won", "dribbles_attempts", "dribbles_success", "dribbles_past", "fouls_drawn", "fouls_committed", "cards_yellow", "cards_red", "penalty_won", "penalty_commited", "penalty_missed", "penalty_saved", "penalty_success"])
         with open('data/followed_leagues.json') as followed_leagues_json:
             followed_leagues_data = json.load(followed_leagues_json)
             for followed_league in followed_leagues_data:

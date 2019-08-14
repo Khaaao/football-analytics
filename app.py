@@ -111,7 +111,8 @@ parser.add_argument("championchip", help="Specify championchip (FL1 = Ligue 1, P
 args = parser.parse_args()
 
 # Load data
-matchs_stats = normalize_raw_data(pd.read_json(f'data/{args.championchip}_DATA.json'))
+# matchs_stats = normalize_raw_data(pd.read_json(f'data/{args.championchip}_DATA.json'))
+matchs_stats = pd.read_csv('data/football_data.csv')
 
 # Create app layout
 app.layout = html.Div(children=[

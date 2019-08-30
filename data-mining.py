@@ -3,6 +3,7 @@ import os
 import json
 import csv
 import requests
+import argparse
 
 # Load env params
 load_dotenv()
@@ -10,7 +11,7 @@ load_dotenv()
 # print(os.getenv("X-RAPIDAPI-KEY"))
 # print(os.getenv("THROTTLING"))
 
-THROTTLING = 1
+THROTTLING = 40
 curr_throttling = 0
 headers = {'Content-Type': 'application/json', 'x-rapidapi-key': os.getenv("X-RAPIDAPI-KEY")}
 day=[]

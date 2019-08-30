@@ -23,7 +23,7 @@ matchs_stats = pd.read_csv('data/football_data.csv', sep = ';', header=0)
 #options_controls
 def generate_dropdown_options(df):
     return [
-        {"label": str(df[df['player_id']==player_id]['team_name'].unique() + ' - ' + df[df['player_id']==player_id]['player_position'].unique() + ' - ' + df[df['player_id']==player_id]['player_name'].unique()), "value": player_id}
+        {"label": str(df[df['player_id']==player_id]['player_name'].unique()), "value": player_id}
         for player_id in df["player_id"].unique()
     ]
 

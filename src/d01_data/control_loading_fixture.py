@@ -8,6 +8,7 @@ pickle_dir = 'data/pickle_db/'
 raw_data_dir = 'data/raw/'
 
 def initialize_pickle(league_id):
+    logging.info(f'---------- initialize_pickle({league_id}) ----------')
     if (os.path.isfile(f'{pickle_dir}league_{league_id}')):
         logging.info(f'File already exist')
     else:
@@ -29,14 +30,13 @@ def initialize_pickle(league_id):
             fixtures_pickle_write.close()
 
 def get_fixture_to_load_by_league_id(league_id):
-    logging.info(f'---------- get_fixture_to_load_by_league_id() ----------')
+    logging.info(f'---------- get_fixture_to_load_by_league_id({league_id}) ----------')
     # fixtures_pickle = pickle.load(open(f'{pickle_dir}league_{league_id}', 'rb'))
     fixtures_pickle = open(f'{pickle_dir}league_{league_id}', 'rb')
     fixtures = pickle.load(fixtures_pickle)
     for fixture in fixtures:
         # Si le match est terminée et non télécharger
         if(fixture['status'] == 'Match Finished' and not fixture['is_loaded']):
-            print(fixture['fixture_id'])
             return fixture['fixture_id']
     fixtures_pickle.close()
     # fixtures_pickle_write = open(f'{pickle_dir}league_{league_id}', 'wb')

@@ -16,12 +16,12 @@ def main():
     logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
 
-    # src.d01_data.load_league.get_all_leagues(headers)
+    # src.d01_data.load_league.get_leagues(headers)
     # src.d01_data.load_fixture.get_fixtures_by_league_id(headers, '525')
     # src.d01_data.load_fixture.handle_fixtures_db('525')
-    # src.d01_data.load_fixture.get_fixture_to_load_by_league_id('525')
     src.d01_data.control_loading_fixture.initialize_pickle('525')
     src.d01_data.control_loading_fixture.get_fixture_to_load_by_league_id('525')
+
     # trottling = os.getenv("TROTTLING")
     # for ()
         

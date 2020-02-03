@@ -3,7 +3,7 @@ import json
 import requests
 import logging
 
-def get_all_leagues(headers):
+def get_leagues(headers):
     logging.info(f'---------- get_all_leagues() ----------')
     utils.flush_file('raw_leagues.json')
     raw_data_dir = 'data/raw/'

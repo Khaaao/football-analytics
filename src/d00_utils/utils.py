@@ -1,8 +1,8 @@
 import os
+import logging
 
-def refresh_raw_input(file_name):
+def flush_file(file_name):
+    logging.info(f'---------- flush_file() ----------')
     if (os.path.isfile(f'data/raw/{file_name}')):
         os.remove(f'data/raw/{file_name}')
-        print("File Deleted")
-    with open(f'data/raw/{file_name}', 'w+'):
-        print("File Created")
+        logging.info(f'{file_name} found, deleting...')

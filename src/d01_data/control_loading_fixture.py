@@ -39,6 +39,3 @@ def get_fixture_to_load_by_league_id(league_id):
         if(fixture['status'] == 'Match Finished' and not fixture['is_loaded']):
             return fixture['fixture_id']
     fixtures_pickle.close()
-    # fixtures_pickle_write = open(f'{pickle_dir}league_{league_id}', 'wb')
-    # pickle.dump(fixtures, fixtures_pickle_write)
-    # fixtures_pickle_write.close()

@@ -4,6 +4,7 @@ import requests
 import logging
 import pickle
 from dotenv import load_dotenv
+import os
 
 raw_data_dir = 'data/raw/'
 pickle_dir = 'data/pickle_db/'

@@ -5,7 +5,7 @@ import os
 import json
 
 pickle_dir = 'data/pickle_db/'
-raw_data_dir = 'data/raw/'
+raw_data_dir = 'data/01_raw/'
 
 def initialize_pickle(league_id):
     logging.info(f'---------- initialize_pickle({league_id}) ----------')

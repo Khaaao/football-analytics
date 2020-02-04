@@ -3,10 +3,11 @@ import json
 import requests
 import logging
 
+raw_data_dir = 'data/01_raw/'
+
 def get_leagues(headers):
     logging.info(f'---------- get_all_leagues() ----------')
     utils.flush_file('raw_leagues.json')
-    raw_data_dir = 'data/raw/'
     file_name = 'raw_leagues.json'
     with open(f'{raw_data_dir}{file_name}', 'w+') as file_raw_leagues:
         logging.debug(f'Open file {raw_data_dir}{file_name}')
